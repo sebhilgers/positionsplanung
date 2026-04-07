@@ -1,0 +1,37 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "positionsplanung"
+version = "0.1.0"
+description = "Erste Testversion zur Ermittlung von Expositionsklassen für Betonbauteile."
+readme = "README.md"
+requires-python = ">=3.11"
+authors = [
+    { name = "Seb Hilgers", email = "sebhi@mailbox.org" }
+]
+dependencies = []
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.0"
+]
+
+[dependency-groups]
+dev = [
+  "pytest>=8.0"
+]
+
+[project.scripts]
+positionsplanung = "positionsplanung.cli:main"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
