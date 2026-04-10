@@ -1,61 +1,53 @@
 # positionsplanung
 
-Erste testbare Version für ein kleines, regelbasiertes Python-Paket zur Ermittlung von Expositionsklassen für Betonbauteile.
+Dieses Projekt bildet den Kern einer Prüfung für eine rechteckige Stahlbetonstütze ab. Es erzeugt einen kompakten Steckbrief, berechnet Kennwerte und prüft geometrische sowie konstruktive Regeln.
 
-## Enthalten
+## Architektur
 
-- interaktive CLI
-- Klasse `Betonbauteil` als Zustandsobjekt
-- regelbasierte Ableitung von Expositionsklassen
-- einfache Ermittlung der maßgebenden Mindestdruckfestigkeitsklasse
-- einfache Ermittlung von `c_min,dur`
-- Tests für Grundfälle
+- `src/positionsplanung/models.py`
+  - `RechteckStuetzeEingabe`: Eingabemodell für die Stütze
+  - `RegelErgebnis`: vereinheitlichtes Ergebnis einer Regelprüfung
+  - `StuetzeAuswertung`: Gesamtobjekt der Auswertung inklusive Kennwerte
+- `src/positionsplanung/config.py`
+  - zentrale Schwellenwerte für die Regeln
+- `src/positionsplanung/rules.py`
+  - 8 Prüfregeln mit einheitlichem Statussystem
+- `src/positionsplanung/checker.py`
+  - zentrale Prüfroutine über alle Regeln
+- `src/positionsplanung/report.py`
+  - kompakter Textsteckbrief; später erweiterbar um PDF/DOCX
 
-## Wichtiger Hinweis
+## Statussystem
 
-Diese Version ist **nur ein MVP zum Testen der Architektur**.
-Sie ist **kein vollständiges Normprogramm** und bildet nicht alle Randbedingungen aus EC2 / DIN EN 206 / Nationalem Anhang ab.
-Insbesondere sind die Regeln zu `XF`, `XA`, `XM`, Nutzungsdauer, Anforderungsklasse, `c_nom`, Verbund, Vorhaltemaß und projektspezifischen Sonderfällen noch stark vereinfacht.
+Alle Regeln geben einen von vier Werten zurück:
 
-## Projektstruktur
+- `OK`
+- `WARNUNG`
+- `NICHT_ERFUELLT`
+- `NICHT_BEWERTET`
 
-```text
-positionsplanung/
-├─ pyproject.toml
-├─ README.md
-├─ src/
-│  └─ positionsplanung/
-│     ├─ __init__.py
-│     ├─ cli.py
-│     ├─ model.py
-│     ├─ questionnaire.py
-│     ├─ rules.py
-│     ├─ durability.py
-│     └─ report.py
-└─ tests/
-   └─ test_basic.py
-```
+## Nutzung im Notebook
 
-## In VS Code / Codex starten
+```python
+from positionsplanung.models import RechteckStuetzeEingabe
+from positionsplanung.checker import pruefe_stuetze
+from positionsplanung.report import erstelle_steckbrief
 
-### Mit `uv`
+stuetze = RechteckStuetzeEingabe(
+    position="A1",
+    bezeichnung="Stütze 1",
+    breite_mm=300,
+    hoehe_mm=300,
+    laenge_mm=4200,
+    betonklasse="C30/37",
+    expositionsklasse="XC1",
+    umgebung="Innenbereich",
+    bemerkung="Standardstütze",
+)
 
-```bash
-uv venv
-.venv\Scripts\activate
-uv pip install -e .
-uv pip install -e .[dev]
-positionsplanung
-```
-
-### Mit normalem `pip`
-
-```bash
-python -m venv .venv
-.venv\Scripts\activate
-python -m pip install -e .
-python -m pip install -e .[dev]
-positionsplanung
+auswertung = pruefe_stuetze(stuetze)
+print(erstelle_steckbrief(auswertung))
+print(auswertung.als_dataframe())
 ```
 
 ## Tests
@@ -64,17 +56,9 @@ positionsplanung
 pytest
 ```
 
-## Beispielidee
+## Annahmen
 
-- Bauteil: Decke
-- Lage: außen
-- Feuchte: wechselnd nass/trocken
-- Frost: ja
-- Tausalz: ja
-
-Erwartung in dieser Testversion:
-- `XC4`
-- `XD3`
-- `XF4`
-- maßgebende Mindestdruckfestigkeitsklasse: `C35/45`
-- `c_min,dur`: `40 mm`
+- Die Eingaben sind auf eine rechteckige Stahlbetonstütze beschränkt.
+- Dimensionen werden in Millimetern angegeben.
+- Der Schlankheitsindikator ist ein einfacher Vorprüfwert, kein normativer Nachweis.
+- Schwellenwerte sind in `src/positionsplanung/config.py` zentral gespeichert.

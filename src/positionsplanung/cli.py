@@ -1,4 +1,4 @@
-from positionsplanung.model import Betonbauteil
+from positionsplanung.model import Betonbauteil, Bauteilflaeche
 from positionsplanung.questionnaire import BauteilAbfrage, CHOICES
 from positionsplanung.rules import Expositionsbewerter
 from positionsplanung.durability import Dauerhaftigkeitsbewerter
@@ -24,22 +24,45 @@ def _frage_bauteiltyp() -> str:
 
         print("Ungueltige Eingabe. Bitte erneut versuchen.")
 
+def erfasse_flaeche():
+    name = input("Flächenname (z.B. oben/unten/aussen): ")
+    f = Bauteilflaeche(name)
+
+    f.lage = input("Lage [innen/aussen]: ")
+    f.feuchte = input("Feuchte: ")
+    f.frost = frage_bool("Frost?")
+    f.tausalz = frage_bool("Tausalz?")
+    f.meerwasser = frage_bool("Meerwasser?")
+
+    return f
+
+
+def erfasse_bauteil():
+    typ = input("Bauteiltyp: ")
+    bauteil = Betonbauteil(typ)
+
+    while True:
+        flaeche = erfasse_flaeche()
+        bauteil.add_flaeche(flaeche)
+
+        if not frage_bool("Weitere Fläche hinzufügen?"):
+            break
+
+    return bauteil
+
 
 def main():
     print("positionsplanung - Testversion")
     print()
 
-    bauteiltyp = _frage_bauteiltyp()
-    bauteil = Betonbauteil(bauteiltyp)
+    bauteil = erfasse_bauteil()
 
-    abfrage = BauteilAbfrage()
-    abfrage.interaktiv_befuellen(bauteil)
+    exp = Expositionsbewerter()
+    dur = Dauerhaftigkeitsbewerter()
 
-    expositionsbewerter = Expositionsbewerter()
-    dauerhaftigkeitsbewerter = Dauerhaftigkeitsbewerter()
-
-    expositionsbewerter.bewerte(bauteil)
-    dauerhaftigkeitsbewerter.bewerte(bauteil)
+    for flaeche in bauteil.flaechen:
+        exp.bewerte_flaeche(flaeche)
+        dur.bewerte_flaeche(flaeche)
 
     print()
     print(build_report(bauteil))

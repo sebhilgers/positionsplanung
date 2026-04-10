@@ -5,9 +5,21 @@ class Betonbauteil:
     Die eigentlichen Regeln liegen bewusst außerhalb dieser Klasse.
     """
 
-    def __init__(self, bauteiltyp: str):
+    def __init__(self, bauteiltyp):
         self.bauteiltyp = bauteiltyp
-        self.flaeche = None
+        self.flaechen = []
+
+    def add_flaeche(self, flaeche):
+        self.flaechen.append(flaeche)
+
+
+    
+
+class Bauteilflaeche:
+    def __init__(self, name):
+        self.name = name  # z.B. "oben", "unten", "aussen"
+
+        # Eingaben
         self.lage = None
         self.feuchte = None
         self.frost = None
@@ -16,17 +28,8 @@ class Betonbauteil:
         self.chemischer_angriff = None
         self.verschleiss = None
 
+        # Ergebnisse
         self.expositionsklassen = []
-        self.begruendungen = []
         self.mindestfestigkeitsklasse = None
         self.cmin_dur_mm = None
 
-    def setze_parameter(self, **kwargs):
-        for key, value in kwargs.items():
-            if not hasattr(self, key):
-                raise AttributeError(f"Unbekanntes Attribut: {key}")
-            setattr(self, key, value)
-
-    def ist_grundsaetzlich_bewertbar(self) -> bool:
-        benoetigt = [self.bauteiltyp, self.lage, self.feuchte]
-        return all(wert is not None for wert in benoetigt)

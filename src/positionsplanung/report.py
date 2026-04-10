@@ -1,41 +1,33 @@
-from positionsplanung.model import Betonbauteil
+from .models import RegelStatus, StuetzeAuswertung
 
 
-def build_report(bauteil: Betonbauteil) -> str:
-    lines = []
-    lines.append("Ergebnis Expositionsbewertung")
-    lines.append("=" * 32)
-    lines.append(f"Bauteiltyp: {bauteil.bauteiltyp}")
-    lines.append(f"Flaeche: {bauteil.flaeche or '-'}")
-    lines.append(f"Lage: {bauteil.lage or '-'}")
-    lines.append(f"Feuchte: {bauteil.feuchte or '-'}")
-    lines.append("")
+def erstelle_steckbrief(auswertung: StuetzeAuswertung) -> str:
+    if not isinstance(auswertung, StuetzeAuswertung):
+        raise TypeError("Die Auswertung muss ein StuetzeAuswertung-Objekt sein")
 
-    if bauteil.expositionsklassen:
-        lines.append("Ermittelte Expositionsklassen: " + ", ".join(bauteil.expositionsklassen))
-    else:
-        lines.append("Es wurden keine Expositionsklassen ermittelt.")
+    eingabe = auswertung.eingabe
+    lines = [
+        f"Stütze: {eingabe.bezeichnung} ({eingabe.position})",
+        f"Betonklasse: {eingabe.betonklasse or 'nicht angegeben'}",
+        f"Expositionsklasse: {eingabe.expositionsklasse or 'nicht angegeben'}",
+        f"Umgebung: {eingabe.umgebung or 'nicht angegeben'}",
+        f"Bemerkung: {eingabe.bemerkung or 'keine'}",
+        "",
+        "Kennwerte:",
+        f"  Querschnittsfläche: {auswertung.kennwerte['querschnittsflaeche_mm2']:.1f} mm²",
+        f"  Kleinste Abmessung: {auswertung.kennwerte['kleinste_abmessung_mm']:.1f} mm",
+        f"  Seitenverhältnis: {auswertung.kennwerte['seitenverhaeltnis']:.2f}",
+        f"  Schlankheitsindikator: {auswertung.kennwerte['schlankheitsindikator']:.2f}",
+        "",
+        "Regelübersicht:",
+    ]
 
-    if bauteil.begruendungen:
-        lines.append("")
-        lines.append("Begruendung:")
-        for grund in bauteil.begruendungen:
-            lines.append(f"- {grund}")
+    for ergebnis in auswertung.regelergebnisse:
+        status = ergebnis.status
+        lines.append(f"  {ergebnis.regel_id}: {status} - {ergebnis.titel}")
+        if status != RegelStatus.OK:
+            lines.append(f"    Hinweis: {ergebnis.meldung}")
+            if ergebnis.empfehlung:
+                lines.append(f"    Empfehlung: {ergebnis.empfehlung}")
 
-    lines.append("")
-    if bauteil.mindestfestigkeitsklasse:
-        lines.append(
-            "Massgebende Mindestdruckfestigkeitsklasse: "
-            f"{bauteil.mindestfestigkeitsklasse}"
-        )
-    else:
-        lines.append("Keine Mindestdruckfestigkeitsklasse ermittelt.")
-
-    if bauteil.cmin_dur_mm is not None:
-        lines.append(f"Mindestbetondeckung aus Dauerhaftigkeit c_min,dur: {bauteil.cmin_dur_mm} mm")
-    else:
-        lines.append("Keine Betondeckung aus Dauerhaftigkeit ermittelt.")
-
-    lines.append("")
-    lines.append("Hinweis: Diese Ausgabe ist eine vereinfachte Testversion und ersetzt keine fachliche Pruefung.")
     return "\n".join(lines)
