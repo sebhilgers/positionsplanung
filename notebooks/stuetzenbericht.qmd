@@ -1,0 +1,39 @@
+---
+title: "Bauteil-Steckbrief"
+format:
+  html: default
+  pdf: default
+  docx: default
+---
+
+# Bauteil-Steckbrief
+
+## Bauteilangaben
+
+- **Position:** S-01
+- **Bezeichnung:** Stütze Achse A/1
+- **Abmessungen:** 300 / 250 / 3600 mm
+- **Betonklasse:** C30/37
+- **Expositionsklasse:** XC3
+- **Umgebung:** innen
+
+## Kennwerte
+
+| Kennwert | Wert |
+|---|---:|
+| Querschnittsfläche | 75000 mm² |
+| Kleinste Abmessung | 250 mm |
+| Seitenverhältnis | 1.20 |
+| Schlankheitsindikator | 14.40 |
+
+## Regelprüfungen
+
+| Regel | Titel | Status | Meldung | Empfehlung |
+|---|---|---|---|---|
+| R001 | Grundwerte positiv | OK | Alle geometrischen Grundwerte sind positiv. |  |
+| R002 | Mindestabmessung | OK | Die kleinste Abmessung ist unauffällig. |  |
+| R003 | Schlankheitsindikator | OK | Der einfache Schlankheitsindikator ist unauffällig. |  |
+
+## Fazit
+
+Das Bauteil wirkt in der vorliegenden Vorprüfung geometrisch unauffällig.

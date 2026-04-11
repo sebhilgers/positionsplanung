@@ -1,0 +1,34 @@
+# Bauteil-Steckbrief
+
+## Bauteilangaben
+
+- Breite b = 200 mm
+- Höhe h = 300 mm
+- Länge l = 3200 mm
+
+## Kennwerte
+
+| Kennwert              |   Wert | Einheit   |
+|:----------------------|-------:|:----------|
+| Breite b              |  200   | mm        |
+| Höhe h                |  300   | mm        |
+| Länge l               | 3200   | mm        |
+| Querschnittsfläche A  |  600   | cm²       |
+| Kleinste Abmessung    |  200   | mm        |
+| Seitenverhältnis      |    1.5 | -         |
+| Schlankheitsindikator |   16   | -         |
+| As,min                |    1.2 | cm²       |
+| As,max                |   24   | cm²       |
+| As,vorh               |    8.5 | cm²       |
+
+## Prüfungen
+
+| Check                   | Status   |   Wert |   Grenzwert | Einheit   | Meldung                                  |
+|:------------------------|:---------|-------:|------------:|:----------|:-----------------------------------------|
+| Mindestabmessung        | OK       |  200   |       200   | mm        | Kleinste Abmessung 200 mm ≥ 200 mm.      |
+| Mindestbewehrung As,min | OK       |    8.5 |         1.2 | cm²       | As,vorh = 8.50 cm² ≥ As,min = 1.20 cm².  |
+| Maximalbewehrung As,max | OK       |    8.5 |        24   | cm²       | As,vorh = 8.50 cm² ≤ As,max = 24.00 cm². |
+
+## Fazit
+
+Alle geprüften Kriterien sind erfüllt.

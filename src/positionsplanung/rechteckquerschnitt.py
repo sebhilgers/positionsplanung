@@ -5,6 +5,8 @@ from __future__ import annotations
 import numbers
 from typing import Optional
 
+import pandas as pd
+
 
 class Rechteckquerschnitt:
     """Rechteckiger Querschnitt mit Kennwertberechnung.
@@ -12,19 +14,29 @@ class Rechteckquerschnitt:
     Alle Eingaben und Ausgaben in cm und cm².
     """
 
-    def __init__(self, b_cm: float, h_cm: float) -> None:
+    def __init__(self, b_mm: float, h_mm: float) -> None:
         """Initialisiere einen rechteckigen Querschnitt.
         
         Args:
-            b_cm: Breite in cm.
-            h_cm: Höhe in cm.
+            b_mm: Breite in mm.
+            h_mm: Höhe in mm.
             
         Raises:
             TypeError: Falls die Werte keine Zahlen sind.
             ValueError: Falls die Werte nicht positiv sind.
         """
-        self.b_cm = self._validate_positive_dimension(b_cm, "b_cm")
-        self.h_cm = self._validate_positive_dimension(h_cm, "h_cm")
+        self.b_mm = self._validate_positive_dimension(b_mm, "b_mm")
+        self.h_mm = self._validate_positive_dimension(h_mm, "h_mm")
+
+    @property
+    def b_cm(self) -> float:
+        """Breite in cm."""
+        return self.b_mm / 10
+
+    @property
+    def h_cm(self) -> float:
+        """Höhe in cm."""
+        return self.h_mm / 10
 
     @staticmethod
     def _validate_positive_dimension(value: float, name: str) -> float:
@@ -37,19 +49,19 @@ class Rechteckquerschnitt:
         return result
 
     @property
-    def querschnittsflaeche_cm2(self) -> float:
-        """Querschnittsfläche in cm²."""
-        return self.b_cm * self.h_cm
+    def A_c_cm2(self) -> float:
+        """Brutto Beton-Querschnittsfläche in cm²."""
+        return self.b_cm * self.h_cm          
 
     @property
     def kleinste_abmessung_cm(self) -> float:
         """Kleinste Abmessung (min(b, h)) in cm."""
-        return min(self.b_cm, self.h_cm)
+        return min(self.b_mm, self.h_mm)
 
     @property
     def groesste_abmessung_cm(self) -> float:
         """Größte Abmessung (max(b, h)) in cm."""
-        return max(self.b_cm, self.h_cm)
+        return max(self.b_mm, self.h_mm)
 
     @property
     def seitenverhaeltnis(self) -> float:
@@ -59,12 +71,12 @@ class Rechteckquerschnitt:
     @property
     def umfang_cm(self) -> float:
         """Umfang in cm."""
-        return 2 * (self.b_cm + self.h_cm)
+        return 2 * (self.b_mm + self.h_mm)
 
     @property
     def diagonal_cm(self) -> float:
         """Diagonale in cm."""
-        return (self.b_cm**2 + self.h_cm**2) ** 0.5
+        return (self.b_mm**2 + self.h_mm**2) ** 0.5
 
     @property
     def traegheitsmoment_y_cm4(self) -> float:
@@ -72,7 +84,7 @@ class Rechteckquerschnitt:
         
         Iy = b * h³ / 12
         """
-        return (self.b_cm * self.h_cm**3) / 12
+        return (self.b_mm * self.h_mm**3) / 12
 
     @property
     def traegheitsmoment_z_cm4(self) -> float:
@@ -80,7 +92,7 @@ class Rechteckquerschnitt:
         
         Iz = h * b³ / 12
         """
-        return (self.h_cm * self.b_cm**3) / 12
+        return (self.h_mm * self.b_mm**3) / 12
 
     @property
     def widerstandsmoment_y_cm3(self) -> float:
@@ -88,7 +100,7 @@ class Rechteckquerschnitt:
         
         Wy = Iy / (h/2) = b * h² / 6
         """
-        return (self.b_cm * self.h_cm**2) / 6
+        return ((self.b_mm / 10) * (self.h_mm / 10)**2) / 6
 
     @property
     def widerstandsmoment_z_cm3(self) -> float:
@@ -96,29 +108,29 @@ class Rechteckquerschnitt:
         
         Wz = Iz / (b/2) = h * b² / 6
         """
-        return (self.h_cm * self.b_cm**2) / 6
+        return ((self.h_mm / 10) * (self.b_mm / 10)**2) / 6
 
     @property
     def traegheitsradius_y_cm(self) -> float:
         """Trägheitsradius um die y-Achse: iy = sqrt(Iy / A)."""
-        return (self.traegheitsmoment_y_cm4 / self.querschnittsflaeche_cm2) ** 0.5
+        return (self.traegheitsmoment_y_cm4 / self.A_c_cm2) ** 0.5
 
     @property
     def traegheitsradius_z_cm(self) -> float:
         """Trägheitsradius um die z-Achse: iz = sqrt(Iz / A)."""
-        return (self.traegheitsmoment_z_cm4 / self.querschnittsflaeche_cm2) ** 0.5
+        return (self.traegheitsmoment_z_cm4 / self.A_c_cm2) ** 0.5
 
     @property
     def traegheitsradius_min_cm(self) -> float:
         """Minimaler Trägheitsradius."""
         return min(self.traegheitsradius_y_cm, self.traegheitsradius_z_cm)
 
-    def als_dict(self) -> dict[str, float]:
+    def to_dict(self) -> dict[str, float]:
         """Gebe alle Kennwerte als Dictionary zurück."""
         return {
-            "b_cm": self.b_cm,
-            "h_cm": self.h_cm,
-            "querschnittsflaeche_cm2": self.querschnittsflaeche_cm2,
+            "b_mm": self.b_mm,
+            "h_mm": self.h_mm,
+            "querschnittsflaeche_cm2": self.A_c_cm2,
             "kleinste_abmessung_cm": self.kleinste_abmessung_cm,
             "groesste_abmessung_cm": self.groesste_abmessung_cm,
             "seitenverhaeltnis": self.seitenverhaeltnis,
@@ -133,9 +145,13 @@ class Rechteckquerschnitt:
             "traegheitsradius_min_cm": self.traegheitsradius_min_cm,
         }
 
+    def to_df(self) -> pd.DataFrame:
+        """Gebe alle Kennwerte als DataFrame zurück."""
+        return pd.DataFrame([self.to_dict()])
+
     def __repr__(self) -> str:
         """String-Darstellung."""
         return (
             f"Rechteckquerschnitt(b={self.b_cm} cm, h={self.h_cm} cm, "
-            f"A={self.querschnittsflaeche_cm2:.2f} cm²)"
+            f"A={self.A_c_cm2:.2f} cm²)"
         )
